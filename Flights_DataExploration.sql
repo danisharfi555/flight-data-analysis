@@ -20,7 +20,7 @@ GROUP BY a.Name
 
 
 
---Q3 List all flights operated by ‘IndiGo’ with airport names (origin and destination)
+--Q3 List all flights operated by â€˜IndiGoâ€™ with airport names (origin and destination)
 
 
 SELECT F.FlightID,
@@ -51,7 +51,7 @@ JOIN Airports A ON r.Origin = A.AirportID
 JOIN Airlines AL ON r.AirlineID = AL.AirlineID
 WHERE rn = 1
 
---Q5 For each flight, show time taken in hours and categorize it as Short (<2h), Medium (2–5h), or Long (>5h)
+--Q5 For each flight, show time taken in hours and categorize it as Short (<2h), Medium (2â€“5h), or Long (>5h)
 
 SELECT 
 	FlightID,
@@ -135,6 +135,24 @@ WHERE rn = 1
 		COUNT(t.ticked_id) as ticked_sold,
 		SUM(t.price) as Total_revenue
 		from Airlines a
+
+--Q10. For Each Passenger , Identify Their Most Frequently  Used Airline .If Passenger has Multiple Aireline With the Same Highest usage, Show all such Airline 
+    
+    with cte_AirlineRank as (
+        select * , rank() over(partition by passengerID order by TicketswithAirline desc) as Airlinerank
+		from 
+		     (select p.PassengerID,p.name as Passenger_name ,a.airlineid ,a.name as AirlineName,
+			        count(*) as TicketswithAirline 
+			 from passengers p
+			 join Tickets t on p.PassengerID=t.PassengerID
+			 join flights f on t.flightid=f.flightid
+			 join Airlines a on a.AirlineID= f.AirlineID
+			 group by p.PassengerID,p.name,a.AirlineID ,a.name
+			 )t
+)
+SELECT  PassengerID,Passenger_name,AirlineName,TicketswithAirline
+FROM cte_AirlineRank
+Where AirLineRank=1
 
 
 
