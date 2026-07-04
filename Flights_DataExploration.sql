@@ -130,11 +130,21 @@ WHERE rn = 1
 
 --Q9 Find the Total revenue and number of tickets sold for each airline, and rank the airlines based on total revenue
    
-   WITH cte_airlines_revenue AS (
-        SELECT A.Airlineid,a.name as AirlineNAME,
-		COUNT(t.ticked_id) as ticked_sold,
-		SUM(t.price) as Total_revenue
-		from Airlines a
+    WITH cte_airlines_revenue AS ( 
+  SELECT a.AirlineID, a.Name AS AirlineName, 
+         COUNT(t.TicketID) AS TicketsSold, 
+         SUM(t.Price) AS TotalRevenue 
+  FROM Airlines a 
+  JOIN Flights f ON a.AirlineID = f.AirlineID 
+  JOIN Tickets t ON f.FlightID = t.FlightID 
+  GROUP BY a.AirlineID, a.Name 
+) 
+SELECT AirlineName, TicketsSold, 
+       CAST(TotalRevenue AS DECIMAL(12,2)) AS TotalRevenue, 
+       RANK() OVER (ORDER BY TotalRevenue DESC) AS RevenueRank 
+FROM cte_airlines_revenue 
+
+  
 
 --Q10. For Each Passenger , Identify Their Most Frequently  Used Airline .If Passenger has Multiple Aireline With the Same Highest usage, Show all such Airline 
     
